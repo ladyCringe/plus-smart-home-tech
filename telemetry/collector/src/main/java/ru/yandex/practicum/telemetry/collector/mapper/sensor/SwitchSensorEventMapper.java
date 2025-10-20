@@ -8,7 +8,7 @@ public class SwitchSensorEventMapper implements SensorEventProtoMapper {
 
     @Override
     public SensorEventProto.PayloadCase key() {
-        return SensorEventProto.PayloadCase.SWITCH_SENSOR;
+        return SensorEventProto.PayloadCase.SWITCH_SENSOR_EVENT;
     }
 
     @Override
@@ -16,7 +16,7 @@ public class SwitchSensorEventMapper implements SensorEventProtoMapper {
         SwitchSensorEvent e = new SwitchSensorEvent();
 
         SensorBaseMapper.fillBase(e, p);
-        e.setState(p.getSwitchSensor().getState());
+        e.setState(p.getSwitchSensorEvent().getState());
         return e;
     }
 }

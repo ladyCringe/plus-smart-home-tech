@@ -8,7 +8,7 @@ public class LightSensorEventMapper implements SensorEventProtoMapper {
 
     @Override
     public SensorEventProto.PayloadCase key() {
-        return SensorEventProto.PayloadCase.LIGHT_SENSOR;
+        return SensorEventProto.PayloadCase.LIGHT_SENSOR_EVENT;
     }
 
     @Override
@@ -16,8 +16,8 @@ public class LightSensorEventMapper implements SensorEventProtoMapper {
         LightSensorEvent e = new LightSensorEvent();
 
         SensorBaseMapper.fillBase(e, p);
-        e.setLinkQuality(p.getLightSensor().getLinkQuality());
-        e.setLuminosity(p.getLightSensor().getLuminosity());
+        e.setLinkQuality(p.getLightSensorEvent().getLinkQuality());
+        e.setLuminosity(p.getLightSensorEvent().getLuminosity());
         return e;
     }
 }

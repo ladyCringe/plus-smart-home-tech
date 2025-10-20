@@ -8,7 +8,7 @@ public class MotionSensorEventMapper implements SensorEventProtoMapper {
 
     @Override
     public SensorEventProto.PayloadCase key() {
-        return SensorEventProto.PayloadCase.MOTION_SENSOR;
+        return SensorEventProto.PayloadCase.MOTION_SENSOR_EVENT;
     }
 
     @Override
@@ -16,9 +16,9 @@ public class MotionSensorEventMapper implements SensorEventProtoMapper {
         MotionSensorEvent e = new MotionSensorEvent();
 
         SensorBaseMapper.fillBase(e, p);
-        e.setLinkQuality(p.getMotionSensor().getLinkQuality());
-        e.setMotion(p.getMotionSensor().getMotion());
-        e.setVoltage(p.getMotionSensor().getVoltage());
+        e.setLinkQuality(p.getMotionSensorEvent().getLinkQuality());
+        e.setMotion(p.getMotionSensorEvent().getMotion());
+        e.setVoltage(p.getMotionSensorEvent().getVoltage());
         return e;
     }
 }

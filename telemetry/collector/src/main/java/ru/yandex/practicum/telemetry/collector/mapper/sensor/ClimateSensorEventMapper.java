@@ -8,7 +8,7 @@ public class ClimateSensorEventMapper implements SensorEventProtoMapper {
 
     @Override
     public SensorEventProto.PayloadCase key() {
-        return SensorEventProto.PayloadCase.CLIMATE_SENSOR;
+        return SensorEventProto.PayloadCase.CLIMATE_SENSOR_EVENT;
     }
 
     @Override
@@ -16,9 +16,9 @@ public class ClimateSensorEventMapper implements SensorEventProtoMapper {
         ClimateSensorEvent e = new ClimateSensorEvent();
 
         SensorBaseMapper.fillBase(e, p);
-        e.setTemperatureC(p.getClimateSensor().getTemperatureC());
-        e.setHumidity(p.getClimateSensor().getHumidity());
-        e.setCo2Level(p.getClimateSensor().getCo2Level());
+        e.setTemperatureC(p.getClimateSensorEvent().getTemperatureC());
+        e.setHumidity(p.getClimateSensorEvent().getHumidity());
+        e.setCo2Level(p.getClimateSensorEvent().getCo2Level());
         return e;
     }
 }
