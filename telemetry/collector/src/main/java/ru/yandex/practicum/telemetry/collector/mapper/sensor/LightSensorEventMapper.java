@@ -1,9 +1,11 @@
 package ru.yandex.practicum.telemetry.collector.mapper.sensor;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.telemetry.collector.model.sensor.LightSensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
 
+@Component
 public class LightSensorEventMapper implements SensorEventProtoMapper {
 
     @Override

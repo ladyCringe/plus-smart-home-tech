@@ -1,9 +1,11 @@
 package ru.yandex.practicum.telemetry.collector.mapper.hub;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.telemetry.collector.model.hub.DeviceRemovedEvent;
 import ru.yandex.practicum.telemetry.collector.model.hub.HubEvent;
 
+@Component
 public class DeviceRemovedEventMapper implements HubEventProtoMapper {
 
     @Override

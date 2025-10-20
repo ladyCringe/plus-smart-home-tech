@@ -1,5 +1,6 @@
 package ru.yandex.practicum.telemetry.collector.mapper.hub;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.ScenarioConditionProto;
@@ -7,6 +8,7 @@ import ru.yandex.practicum.telemetry.collector.model.hub.*;
 
 import java.util.stream.Collectors;
 
+@Component
 public class ScenarioAddedEventMapper implements HubEventProtoMapper {
 
     @Override
@@ -34,6 +36,7 @@ public class ScenarioAddedEventMapper implements HubEventProtoMapper {
         result.setSensorId(c.getSensorId());
         result.setType(ConditionType.valueOf(c.getType().name()));
         result.setOperation(ConditionOperation.valueOf(c.getOperation().name()));
+        result.setValue(c.getValueCase().getNumber() == 4 ? c.getBoolValue() ? 1 : 0 : c.getIntValue());
         return result;
     }
 

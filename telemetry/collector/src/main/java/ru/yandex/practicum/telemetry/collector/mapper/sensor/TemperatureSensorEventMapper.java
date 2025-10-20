@@ -1,9 +1,11 @@
 package ru.yandex.practicum.telemetry.collector.mapper.sensor;
 
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.telemetry.collector.model.sensor.SensorEvent;
 import ru.yandex.practicum.telemetry.collector.model.sensor.TemperatureSensorEvent;
 
+@Component
 public class TemperatureSensorEventMapper implements SensorEventProtoMapper {
 
     @Override
