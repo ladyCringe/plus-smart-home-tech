@@ -31,6 +31,7 @@ public class AggregationStarter {
     @Value("${aggregator.topic.snapshots}") private String snapshotsTopic;
 
     public void start() {
+        Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
         try {
             consumer.subscribe(List.of(sensorsTopic));
             log.info("Aggregator subscribed to {}", sensorsTopic);
@@ -56,6 +57,7 @@ public class AggregationStarter {
                 consumer.commitAsync();
             }
         } catch (WakeupException ignored) {
+            log.info("Aggregator wake up");
         } catch (Exception e) {
             log.error("Aggregator loop error", e);
         } finally {
