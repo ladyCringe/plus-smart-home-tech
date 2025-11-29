@@ -1,0 +1,104 @@
+grpc:
+  client:
+    hub-router:
+      address: static://localhost:59090
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+logging:
+  level:
+    ru.yandex.practicum: DEBUG
+    org.springframework.orm.jpa: INFO
+    org.springframework.orm.jpa.JpaTransactionManager: INFO
+    org.springframework.transaction: INFO
+    org.springframework.transaction.interceptor: INFO
+
+analyzer:
+  kafka:
+    bootstrap-servers: localhost:9092
+    offset-fix-count: 10
+
+    hubconsumer:
+      properties:
+        bootstrap:
+          servers: ${analyzer.kafka.bootstrap-servers}
+        enable:
+          auto:
+            commit: false
+        client:
+          id: telemetry.analyser.hub.client.v1
+        group:
+          id: telemetry.analyser.hub.v1
+        key:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value:
+          deserializer: ru.yandex.practicum.kafka.serializer.HubEventDeserializer
+      topic: telemetry.hubs.v1
+      poll-timeout: 200ms
+
+    snapshotconsumer:
+      properties:
+        bootstrap:
+          servers: ${analyzer.kafka.bootstrap-servers}
+        enable:
+          auto:
+            commit: false
+        client:
+          id: telemetry.analyser.snapshot.client.v1
+        group:
+          id: telemetry.analyser.snapshot.v1
+        key:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value:
+          deserializer: ru.yandex.practicum.kafka.serializer.SensorsSnapshotDeserializer
+      topic: telemetry.snapshots.v1
+      poll-timeout: 200ms
+
+  streams:
+    hub:
+      topic: telemetry.hubs.v1
+      pollTimeout: PT1S
+      consumer:
+        bootstrap:
+          servers: localhost:9092
+        group:
+          id: analyzer-hub
+        enable:
+          auto:
+            commit: false
+        key:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value:
+          deserializer: ru.yandex.practicum.kafka.serializer.HubEventDeserializer
+
+    snapshot:
+      topic: telemetry.snapshots.v1
+      pollTimeout: PT1S
+      consumer:
+        bootstrap:
+          servers: localhost:9092
+        group:
+          id: analyzer-snapshot
+        enable:
+          auto:
+            commit: false
+        key:
+          deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value:
+          deserializer: ru.yandex.practicum.kafka.serializer.SensorsSnapshotDeserializer
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:6432/analit
+    driver-class-name: org.postgresql.Driver
+    username: analit
+    password: analit
+
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    hibernate:
+      ddl-auto: none
