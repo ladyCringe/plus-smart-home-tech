@@ -53,5 +53,64 @@ services:
       timeout: 3s
       retries: 10
 
+  shopping_store_postgres:
+    image: postgres:16-alpine
+    container_name: shopping_store_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: shopping_store_db
+      POSTGRES_USER: smart_home
+      POSTGRES_PASSWORD: smart_home
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "6442:5432"
+    volumes:
+      - shopping_store_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  shopping_cart_postgres:
+    image: postgres:16-alpine
+    container_name: shopping_cart_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: shopping_cart_db
+      POSTGRES_USER: smart_home
+      POSTGRES_PASSWORD: smart_home
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "6452:5432"
+    volumes:
+      - shopping_cart_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  warehouse_postgres:
+    image: postgres:16-alpine
+    container_name: warehouse_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: warehouse_db
+      POSTGRES_USER: smart_home
+      POSTGRES_PASSWORD: smart_home
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "6462:5432"
+    volumes:
+      - warehouse_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 volumes:
   analit_postgres_data:
+  shopping_store_postgres_data:
+  shopping_cart_postgres_data:
+  warehouse_postgres_data:

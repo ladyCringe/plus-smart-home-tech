@@ -1,0 +1,61 @@
+server:
+  port: 0
+
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+
+aggregator:
+  topic:
+    sensors: telemetry.sensors.v1
+    snapshots: telemetry.snapshots.v1
+
+  kafka:
+    consumer:
+      bootstrap:
+        servers: ${spring.kafka.bootstrap-servers}
+      group:
+        id: aggregator.group
+      client:
+        id: aggregator-consumer
+      enable:
+        auto:
+          commit: false
+      auto:
+        offset:
+          reset: earliest
+      key:
+        deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value:
+        deserializer: ru.yandex.practicum.kafka.serializer.SensorEventDeserializer
+      max:
+        poll:
+          records: 100
+        partition:
+          fetch:
+            bytes: 3072000
+      fetch:
+        max:
+          bytes: 3072000
+
+    producer:
+      bootstrap:
+        servers: ${spring.kafka.bootstrap-servers}
+      client:
+        id: aggregator-producer
+      key:
+        serializer: org.apache.kafka.common.serialization.StringSerializer
+      value:
+        serializer: ru.yandex.practicum.kafka.serializer.GeneralAvroSerializer
+      acks: all
+      retries: 3
+      linger:
+        ms: 10
+      batch:
+        size: 16384
+      max:
+        in:
+          flight:
+            requests:
+              per:
+                connection: 1
