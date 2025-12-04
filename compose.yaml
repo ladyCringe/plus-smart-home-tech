@@ -109,8 +109,69 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  commerce_order_postgres:
+    image: postgres:16-alpine
+    container_name: commerce_order_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: commerce_order_db
+      POSTGRES_USER: smart_home
+      POSTGRES_PASSWORD: smart_home
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "6463:5432"
+    volumes:
+      - commerce_order_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  commerce_delivery_postgres:
+    image: postgres:16-alpine
+    container_name: commerce_delivery_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: commerce_delivery_db
+      POSTGRES_USER: smart_home
+      POSTGRES_PASSWORD: smart_home
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "6464:5432"
+    volumes:
+      - commerce_delivery_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  commerce_payment_postgres:
+    image: postgres:16-alpine
+    container_name: commerce_payment_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: commerce_payment_db
+      POSTGRES_USER: smart_home
+      POSTGRES_PASSWORD: smart_home
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "6465:5432"
+    volumes:
+      - commerce_payment_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
 volumes:
   analit_postgres_data:
   shopping_store_postgres_data:
   shopping_cart_postgres_data:
   warehouse_postgres_data:
+  commerce_order_postgres_data:
+  commerce_delivery_postgres_data:
+  commerce_payment_postgres_data:

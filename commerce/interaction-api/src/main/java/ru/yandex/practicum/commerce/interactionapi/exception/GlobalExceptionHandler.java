@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.commerce.interactionapi.exception.cart.NoProductsInShoppingCartException;
 import ru.yandex.practicum.commerce.interactionapi.exception.cart.NotAuthorizedUserException;
+import ru.yandex.practicum.commerce.interactionapi.exception.delivery.NoDeliveryFoundException;
+import ru.yandex.practicum.commerce.interactionapi.exception.order.NoOrderFoundException;
+import ru.yandex.practicum.commerce.interactionapi.exception.payment.NotEnoughInfoInOrderToCalculateException;
 import ru.yandex.practicum.commerce.interactionapi.exception.store.ProductNotFoundException;
 import ru.yandex.practicum.commerce.interactionapi.exception.warehouse.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.commerce.interactionapi.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouseException;
@@ -45,5 +48,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<NoSpecifiedProductInWarehouseException> handleNoSpecifiedProduct(
             NoSpecifiedProductInWarehouseException ex) {
         return ResponseEntity.status(ex.getHttpStatus()).body(ex);
+    }
+
+    @ExceptionHandler(NotEnoughInfoInOrderToCalculateException.class)
+    public ResponseEntity<String> handleNotEnoughInfo(NotEnoughInfoInOrderToCalculateException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(NoOrderFoundException.class)
+    public ResponseEntity<String> handleNoOrder(NoOrderFoundException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(NoDeliveryFoundException.class)
+    public ResponseEntity<String> handleNoOrder(NoDeliveryFoundException ex) {
+        return ResponseEntity.status(ex.getHttpStatus()).body(ex.getMessage());
     }
 }

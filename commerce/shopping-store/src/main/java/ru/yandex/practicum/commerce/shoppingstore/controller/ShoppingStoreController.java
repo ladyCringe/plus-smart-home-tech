@@ -2,12 +2,14 @@ package ru.yandex.practicum.commerce.shoppingstore.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.commerce.interactionapi.api.ShoppingStoreApi;
 import ru.yandex.practicum.commerce.interactionapi.dto.store.*;
+import ru.yandex.practicum.commerce.shoppingstore.model.PagingMapper;
 import ru.yandex.practicum.commerce.shoppingstore.service.ShoppingStoreService;
 
-import java.util.*;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/shopping-store")
@@ -15,19 +17,15 @@ import java.util.*;
 public class ShoppingStoreController implements ShoppingStoreApi {
 
     private final ShoppingStoreService shoppingStoreService;
+    private final PagingMapper pagingMapper;
 
     @Override
     public ProductsDto getProducts(ProductCategory category, Pageable pageable) {
         Page<ProductDto> content = shoppingStoreService
                 .getProducts(category, pageable);
-        HashMap<String, String> sort = new HashMap<>();
-        if (pageable.getSort() != null && !pageable.getSort().isEmpty()) {
-            sort.put("direction", pageable.getSort().get(1));
-            sort.put("property", pageable.getSort().get(0));
-        }
         return ProductsDto.builder()
                 .content(content.getContent())
-                .sort(Collections.singletonList(sort))
+                .sort(pagingMapper.toSortModel(pageable))
                 .build();
     }
 
