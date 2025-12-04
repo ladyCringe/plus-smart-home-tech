@@ -3,16 +3,15 @@ package ru.yandex.practicum.commerce.shoppingstore.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.commerce.interactionapi.dto.store.*;
 import ru.yandex.practicum.commerce.interactionapi.exception.store.ProductNotFoundException;
-import ru.yandex.practicum.commerce.shoppingstore.model.ProductMapper;
+import ru.yandex.practicum.commerce.shoppingstore.model.PagingMapper;
 import ru.yandex.practicum.commerce.shoppingstore.model.ProductEntity;
+import ru.yandex.practicum.commerce.shoppingstore.model.ProductMapper;
 import ru.yandex.practicum.commerce.shoppingstore.repository.ProductRepository;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -22,15 +21,12 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final PagingMapper pagingMapper;
 
     @Override
     @Transactional(readOnly = true)
     public Page<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
-        PageRequest pageRequest =  Optional.ofNullable(pageable)
-                .filter(it -> it.getPage() != null && it.getSize() != null)
-                .map(it -> PageRequest.of(it.getPage(), it.getSize(),
-                        Sort.by(Sort.Direction.fromString(it.getSort().get(1)), it.getSort().getFirst())))
-                .orElse(PageRequest.of(0, Integer.MAX_VALUE));
+        PageRequest pageRequest = pagingMapper.toPageRequest(pageable);
         return productRepository.findAllByProductCategory(category, pageRequest)
                 .map(productMapper::toDto);
     }

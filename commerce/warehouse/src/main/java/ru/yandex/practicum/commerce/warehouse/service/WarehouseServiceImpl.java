@@ -9,9 +9,12 @@ import ru.yandex.practicum.commerce.interactionapi.dto.warehouse.*;
 import ru.yandex.practicum.commerce.interactionapi.exception.warehouse.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.commerce.interactionapi.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouseException;
 import ru.yandex.practicum.commerce.interactionapi.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
+import ru.yandex.practicum.commerce.warehouse.model.OrderBookingEntity;
 import ru.yandex.practicum.commerce.warehouse.model.WarehouseProductEntity;
+import ru.yandex.practicum.commerce.warehouse.repository.OrderBookingRepository;
 import ru.yandex.practicum.commerce.warehouse.repository.WarehouseProductRepository;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -21,6 +24,7 @@ import java.util.UUID;
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseProductRepository warehouseProductRepository;
+    private final OrderBookingRepository orderBookingRepository;
 
     @Value("${warehouse.address.country:Kazakhstan}")
     private String country;
@@ -114,6 +118,84 @@ public class WarehouseServiceImpl implements WarehouseService {
         long newQuantity = entity.getQuantity() + request.getQuantity();
         entity.setQuantity(newQuantity);
         warehouseProductRepository.save(entity);
+    }
+
+    @Override
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
+        Map<UUID, Integer> products = request.getProducts();
+        if (products == null || products.isEmpty()) {
+            throw new NoSpecifiedProductInWarehouseException("Нет товаров для сборки заказа");
+        }
+
+        double totalWeight = 0.0;
+        double totalVolume = 0.0;
+        boolean fragile = false;
+
+        for (Map.Entry<UUID, Integer> entry : products.entrySet()) {
+            UUID productId = entry.getKey();
+            int qty = entry.getValue() == null ? 0 : entry.getValue();
+
+            WarehouseProductEntity product = warehouseProductRepository.findById(productId)
+                    .orElseThrow(() -> new NoSpecifiedProductInWarehouseException(
+                            "Нет информации о товаре " + productId + " на складе"
+                    ));
+
+            if (product.getQuantity() < qty) {
+                throw new ProductInShoppingCartLowQuantityInWarehouseException(
+                        "Недостаточное количество товара " + productId + " на складе"
+                );
+            }
+
+            product.setQuantity(product.getQuantity() - qty);
+
+            totalWeight += product.getWeight() * qty;
+            totalVolume += product.getWidth() * product.getHeight() * product.getDepth() * qty;
+            if (product.isFragile()) {
+                fragile = true;
+            }
+        }
+
+        // создаём/обновляем бронирование заказа
+        OrderBookingEntity booking = orderBookingRepository.findByOrderId(request.getOrderId())
+                .orElseGet(() -> {
+                    OrderBookingEntity e = new OrderBookingEntity();
+                    e.setOrderId(request.getOrderId());
+                    return e;
+                });
+
+        booking.setProducts(new HashMap<>(products));
+        orderBookingRepository.save(booking);
+
+        return new BookedProductsDto(totalWeight, totalVolume, fragile);
+    }
+
+    @Override
+    public void shippedToDelivery(ShippedToDeliveryRequest request) {
+        OrderBookingEntity booking = orderBookingRepository.findByOrderId(request.getOrderId())
+                .orElseThrow(() -> new NoSpecifiedProductInWarehouseException(
+                        "Не найдено бронирование для заказа " + request.getOrderId()
+                ));
+
+        booking.setDeliveryId(request.getDeliveryId());
+    }
+
+    @Override
+    public void acceptReturn(Map<UUID, Integer> products) {
+        if (products == null || products.isEmpty()) {
+            return;
+        }
+
+        for (Map.Entry<UUID, Integer> entry : products.entrySet()) {
+            UUID productId = entry.getKey();
+            int qty = entry.getValue() == null ? 0 : entry.getValue();
+
+            WarehouseProductEntity product = warehouseProductRepository.findById(productId)
+                    .orElseThrow(() -> new NoSpecifiedProductInWarehouseException(
+                            "Нет информации о товаре " + productId + " на складе"
+                    ));
+
+            product.setQuantity(product.getQuantity() + qty);
+        }
     }
 
     @Override
